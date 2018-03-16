@@ -12,12 +12,19 @@ contract KYC is Admins {
 
     mapping(address => UserInfo) public informations;
 
+    event CreateUserInfo(address user, bytes32 hashData, uint valueNodes);
+    event ChangeUserInfo(address user, bytes32 hashData, uint valueNodes);
+    event UserAuthorization(address user);
+    event WithdrawalFunds(address addr, uint amount);
+
     function createUserInfo(address user, bytes32 hashData, uint valueNodes) external onlyServer {
         require(informations[user].hashData == 0 && hashData != 0);
         require(informations[user].valueNodes == 0 && valueNodes > 0);
         require(informations[user].valid == false);
 
         informations[user] = UserInfo(hashData, valueNodes, false);
+
+        CreateUserInfo(user, hashData, valueNodes);
     }
 
     function changeUserInfo(address user, bytes32 hashData, uint valueNodes) external onlyServer {
@@ -25,6 +32,8 @@ contract KYC is Admins {
         require(informations[user].valueNodes > 0 );
 
         informations[user] = UserInfo(hashData, valueNodes, false);
+
+        ChangeUserInfo(user, hashData, valueNodes);
     }
 
     function userAuthorization() external payable {
@@ -34,6 +43,8 @@ contract KYC is Admins {
         require(informations[msg.sender].valueNodes < (msg.value * 100));
 
         informations[msg.sender].valid = true;
+
+        UserAuthorization(msg.sender);
     }
 
     function isAuthorized(address user) external constant returns(bool) {
@@ -44,11 +55,17 @@ contract KYC is Admins {
     }
 
     function withdrawalFunds(address addr, uint amount) external onlyAdmin {
+
+        uint summ = 0;
         if(amount != 0) {
-            addr.transfer(amount);
+            require(this.balance >= amount);
+            summ = amount;
         } else {
-            addr.transfer(this.balance);
+            summ = this.balance;
         }
+        addr.transfer(summ);
+
+        WithdrawalFunds(addr, summ);
     }
 }
 

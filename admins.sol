@@ -10,6 +10,7 @@ contract Admins {
 
 	event AddAdmin(address newAdmin);
 	event RemoveAdmin(address adminAdress);
+	event ChangeServerAddr(address oldAddress, address newAddress);
 
 	function removeAdmin(address a) external onlyAdmin {
 		admins[a] = false;
@@ -20,8 +21,6 @@ contract Admins {
 		admins[a] = true;
 		AddAdmin(a);
 	}
-
-	event ChangeServerAddr(address oldAddress, address newAddress);
 
 	function changeServerAddr(address newAddress) external onlyAdmin {
 		ChangeServerAddr(serverAddress, newAddress);
