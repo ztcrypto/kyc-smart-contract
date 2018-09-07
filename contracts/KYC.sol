@@ -40,7 +40,7 @@ contract KYC is Admins {
         require(informations[msg.sender].hashData != 0);
         require(informations[msg.sender].valueNodes > 0 );
         require(informations[msg.sender].valid == false);
-        require(informations[msg.sender].valueNodes < (msg.value * 100));
+        require(informations[msg.sender].valueNodes <= (msg.value * 100));
 
         informations[msg.sender].valid = true;
 
